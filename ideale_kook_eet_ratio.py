@@ -7,81 +7,82 @@ Original file is located at
     https://colab.research.google.com/drive/1p7M2oXqAnoymDr-hPkki3XcUx23WVAJQ
 """
 
-import numpy as np
+import streamlit as st
 import math
 
-p = 0.31    #dit is de gewenste kook/eet verhouding
+st.title("Kook / Eet verhouding checker")
 
-try:
-    K_input = input("Hoeveel keer heb je gekookt? ")
-    if '.' in K_input or ',' in K_input:
-        print("Voer een heel getal in of ik sla je dood met de roze dildo!")
-        exit()
-    K = int(K_input)
-except ValueError:
-    print("Als je nog een keer een ongeldig getal invoert, dan installeert dit programma automatisch een virus in je kont")
-    exit()
+p = 0.31
 
-try:
-    E_input = input("Hoeveel keer heb je meegegeten? ")
-    if '.' in E_input or ',' in E_input:
-        print("31.31 toch? V V V VOOOOOOOOO. Nu ff normaal doen of ik stop dit programma in je moeder")
-        exit()
-    E = int(E_input)
-except ValueError:
-    print("Ik hou ook van sappige, glibberige, roze, strakke, 18 jaar oude K.....!!!")
-    exit()
+# Vrije tekstinvoer
+K_raw = st.text_input("Hoe vaak heb je gekookt?")
+E_raw = st.text_input("Hoe vaak heb je meegegeten?")
 
-def find_kook_eet_strat(p,K,E): #hoe vaak moet ik koken voordat mijn kook/eet verhouding minstens 0.31 is?
-    p_min = p - 0.005 #0.305, laagste verhouding die 0.31 output geeft
-    p_max = p + 0.004 #0.314, hoogste verhouding die 0.31 output geeft
+# Controlefunctie
+def is_int(value):
+    try:
+        int(value)
+        return True
+    except ValueError:
+        return False
 
-    if (K/E) > 1:
-        print("Hoe tf heb je vaker gekookt dan meegegeten!?")
-    else:
-        x = math.ceil((p_min*E - K)/(1-p_min))
+# Stop de app direct als iets fout is
+if K_raw and not is_int(K_raw):
+    st.error("Het aantal keren koken moet een geheel getal zijn.")
+    st.stop()
+
+if E_raw and not is_int(E_raw):
+    st.error("Het aantal keren mee-eten moet een geheel getal zijn.")
+    st.stop()
+
+# Alleen doorgaan als beide velden geldig zijn én ingevuld
+if K_raw and E_raw:
+    K = int(K_raw)
+    E = int(E_raw)
+
+    def find_kook_eet_strat(p, K, E):
+        p_min = p - 0.005
+        p_max = p + 0.004
+
+        if (K / E) > 1:
+            st.error("Hoe kun je vaker gekookt hebben dan meegegeten?")
+            return
+
+        x = math.ceil((p_min * E - K) / (1 - p_min))
 
         if x <= 0:
-            print("Je verhouding is al minstens 0.31... VO!")
-        elif x>0:
-            print(f"Je moet {x} keer koken om op een verhouding van 0.31 of hoger te staan")
+            st.success("Je verhouding is al minstens 0.31!")
+        else:
+            st.info(f"Je moet minstens {x} keer koken om op een verhouding van 0.31 of hoger te staan.")
 
-        #welke aantallen moet ik koken zodat het precies 0.31 is?
+        x_min = (p_min * E - K) / (1 - p_min)
+        x_max = (p_max * E - K) / (1 - p_max)
 
-        x_min = (p_min*E - K)/(1-p_min) #laagste exacte aantal koken
-        x_max = (p_max*E - K)/(1-p_max) #hoogste exacte aantal koken
-
-        if x_min >= 0 and (x_max-x_min) >= 1:   #check of er hele en positieve getallen uit komen
+        if x_min >= 0 and (x_max - x_min) >= 1:
             if (x_max - x_min) > 50:
-                print("33 anuslikkende bitch, doe ff normaal")
+                st.warning("Er zijn te veel mogelijkheden om netjes te tonen.")
                 return
-            x_min_int = math.ceil(x_min)        #integer gemaakt
+            x_min_int = math.ceil(x_min)
             x_max_int = math.floor(x_max)
 
-            keren_koken = list(range(x_min_int, x_max_int + 1)) #lijst van hoevaak je kan koken
+            keren_koken = list(range(x_min_int, x_max_int + 1))
 
             if len(keren_koken) == 1:
-                print(f"Je moet {keren_koken[0]} keer koken om op exact 0.31 te staan.")
+                st.write(f"Je kunt exact op 0.31 staan door {keren_koken[0]} keer te koken.")
             elif len(keren_koken) == 2:
-                print(f"Je moet {keren_koken[0]} of {keren_koken[1]} keer koken om op exact 0.31 te staan.")
+                st.write(f"Je kunt exact op 0.31 staan door {keren_koken[0]} of {keren_koken[1]} keer te koken.")
             else:
                 opties = ", ".join(map(str, keren_koken[:-1])) + f" of {keren_koken[-1]}"
-                print(f"Je moet {opties} keer koken om op exact 0.31 te staan.")
-        elif x_min < 0 or (x_max-x_min) < 1:
-            print("Als je exact op 0.31 wilt staan moet je meer mee eten kut HJ")
-
-        else: #wat is het minste aantal keren dat ik moet koken en mee moet eten zodat ik wél exact 0.31 kan staan?
-            kook_oplossing = []
-            eet_oplossing = []
-
-            for i in range(0, 31):          #probeer x = 0 t/m 31
-                for j in range(0,31):       #        y = 0 t/m 31
+                st.write(f"Je kunt exact op 0.31 staan door {opties} keer te koken.")
+        else:
+            for i in range(0, 31):
+                for j in range(0, 31):
                     totaal_koken = K + i
                     totaal_eten = E + i + j
-                    verhouding = totaal_koken/totaal_eten
-                    if verhouding >= p_min and verhouding <= p_max:
-                        kook_oplossing.append(i)
-                        eet_oplossing.append(j)
-            return f"Je moet minstens {min(kook_oplossing)} keer koken en {min(eet_oplossing)} keer mee-eten om een verhouding van 0.31 te krijgen."
+                    verhouding = totaal_koken / totaal_eten
+                    if p_min <= verhouding <= p_max:
+                        st.write(f"Je moet minstens {i} keer koken en {j} keer extra mee-eten om op 0.31 te komen.")
+                        return
+            st.warning("Geen oplossing gevonden binnen 30 keer koken/mee-eten.")
 
-find_kook_eet_strat(p,K,E)
+    find_kook_eet_strat(p, K, E)
