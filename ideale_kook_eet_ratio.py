@@ -88,7 +88,7 @@ if K_raw and E_raw:
         
         if x_min >= 0 and (x_max - x_min) >= 1:
             if (x_max - x_min) > 50:
-                st.warning("Er moet nu even vaak koken als het aantal keren dat ik je moeder heb geneukt")
+                st.warning("Je moet nu even vaak koken als het aantal keren dat ik je moeder heb geneukt")
                 return
                 
             x_min_int = math.ceil(x_min)
