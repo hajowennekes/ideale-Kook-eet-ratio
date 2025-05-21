@@ -74,7 +74,7 @@ if K_raw and E_raw:
         p_max = p + 0.004
         
         if (K / E) > 1:
-            st.error("Hoe tf heb je vaker gekookt dan meegegeten??? Nee maar ff serieus, als je dit leest trek je een bak :)")
+            st.error("Hoe tf heb je vaker gekookt dan meegegeten??? Nee maar ff serieus, als je dit leest trek je een bak @%$#")
             return
             
         x = math.ceil((p_min * E - K) / (1 - p_min))
@@ -88,7 +88,7 @@ if K_raw and E_raw:
         
         if x_min >= 0 and (x_max - x_min) >= 1:
             if (x_max - x_min) > 50:
-                st.warning("Er zijn te veel mogelijkheden om netjes te tonen.")
+                st.warning("Er zijn nu evenveel mogelijkheden als het aantal keren dat ik je moeder heb geneukt")
                 return
                 
             x_min_int = math.ceil(x_min)
