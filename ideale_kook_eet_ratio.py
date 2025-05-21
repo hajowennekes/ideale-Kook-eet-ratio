@@ -11,28 +11,57 @@ import streamlit as st
 import math
 
 st.title("Kook / Eet verhouding checker")
-
 p = 0.31
 
 # Vrije tekstinvoer
 K_raw = st.text_input("Hoe vaak heb je gekookt?")
 E_raw = st.text_input("Hoe vaak heb je meegegeten?")
 
-# Controlefunctie
-def is_int(value):
+# Individuele validatie voor K en E met verschillende foutmeldingen
+def validate_K(value):
+    if not value:
+        return True, None  # Empty input is allowed initially
+    
+    # Check of het een nummer is
     try:
-        int(value)
-        return True
+        float_value = float(value)
+        
+        # Check of het een geheel getal is
+        if float_value.is_integer():
+            return True, None
+        else:
+            return False, "Voer een heel getal in of ik sla je dood met de roze dildo!"
+            
     except ValueError:
-        return False
+        return False, "Als je nog een keer een ongeldig getal invoert, dan installeert dit programma automatisch een virus in je kont"
 
-# Stop de app direct als iets fout is
-if K_raw and not is_int(K_raw):
-    st.error("Het aantal keren koken moet een geheel getal zijn.")
+def validate_E(value):
+    if not value:
+        return True, None  # Empty input is allowed initially
+    
+    # Check of het een nummer is
+    try:
+        float_value = float(value)
+        
+        # Check of het een geheel getal is
+        if float_value.is_integer():
+            return True, None
+        else:
+            return False, f"Je hebt 31.31 ingevuld toch? V V V VOOOOOOOOO. Nu ff normaal doen of ik stop dit programma in je moeder"
+            
+    except ValueError:
+        return False, f"Als je dit bericht ziet hou jij ook van sappige, volle, glibberige, roze, strakke, 18 jaar oude K.....!!!"
+
+# Valideer de invoer voor koken (K)
+K_valid, K_error = validate_K(K_raw)
+if not K_valid:
+    st.error(K_error)
     st.stop()
 
-if E_raw and not is_int(E_raw):
-    st.error("Het aantal keren mee-eten moet een geheel getal zijn.")
+# Valideer de invoer voor mee-eten (E)
+E_valid, E_error = validate_E(E_raw)
+if not E_valid:
+    st.error(E_error)
     st.stop()
 
 # Alleen doorgaan als beide velden geldig zijn én ingevuld
@@ -43,37 +72,36 @@ if K_raw and E_raw:
     def find_kook_eet_strat(p, K, E):
         p_min = p - 0.005
         p_max = p + 0.004
-
+        
         if (K / E) > 1:
-            st.error("Hoe kun je vaker gekookt hebben dan meegegeten?")
+            st.error("Hoe tf heb je vaker gekookt dan meegegeten??? Nee maar ff serieus, als je dit leest trek je een bak :)")
             return
-
+            
         x = math.ceil((p_min * E - K) / (1 - p_min))
-
         if x <= 0:
             st.success("Je verhouding is al minstens 0.31!")
         else:
             st.info(f"Je moet minstens {x} keer koken om op een verhouding van 0.31 of hoger te staan.")
-
+            
         x_min = (p_min * E - K) / (1 - p_min)
         x_max = (p_max * E - K) / (1 - p_max)
-
+        
         if x_min >= 0 and (x_max - x_min) >= 1:
             if (x_max - x_min) > 50:
                 st.warning("Er zijn te veel mogelijkheden om netjes te tonen.")
                 return
+                
             x_min_int = math.ceil(x_min)
             x_max_int = math.floor(x_max)
-
             keren_koken = list(range(x_min_int, x_max_int + 1))
-
+            
             if len(keren_koken) == 1:
-                st.write(f"Je kunt exact op 0.31 staan door {keren_koken[0]} keer te koken.")
+                st.write(f"Je kunt exact op 0.31 komen te staan door {keren_koken[0]} keer te koken.")
             elif len(keren_koken) == 2:
-                st.write(f"Je kunt exact op 0.31 staan door {keren_koken[0]} of {keren_koken[1]} keer te koken.")
+                st.write(f"Je kunt exact op 0.31 komen te staan door {keren_koken[0]} of {keren_koken[1]} keer te koken.")
             else:
                 opties = ", ".join(map(str, keren_koken[:-1])) + f" of {keren_koken[-1]}"
-                st.write(f"Je kunt exact op 0.31 staan door {opties} keer te koken.")
+                st.write(f"Je kunt exact op 0.31 komen te staan door {opties} keer te koken.")
         else:
             for i in range(0, 31):
                 for j in range(0, 31):
@@ -84,5 +112,5 @@ if K_raw and E_raw:
                         st.write(f"Je moet minstens {i} keer koken en {j} keer extra mee-eten om op 0.31 te komen.")
                         return
             st.warning("Geen oplossing gevonden binnen 30 keer koken/mee-eten.")
-
+            
     find_kook_eet_strat(p, K, E)
